@@ -1,0 +1,40 @@
+{
+    "name": "laggards/aliyun",
+    "description": "aliyun services for laravel 5.1",
+    "keywords": ["framework", "laravel", "aliyun"],
+	"homepage": "https://github.com/laggards/aliyun",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "laggards",
+            "email": "laggards@foxmail.com"
+        }
+    ],
+    "require": {
+        "laravel/framework": "5.1.*",
+      	"illuminate/support": ">=5.0",
+      	"league/flysystem": "~1.0",
+      	"guzzle/guzzle": "3.7.1"
+    },
+    "autoload": {
+      "classmap": ["src/","core/","oss/","sdk.class.php"]
+    },
+    "scripts": {
+        "post-install-cmd": [
+            "php artisan optimize"
+        ],
+        "pre-update-cmd": [
+            "php artisan clear-compiled"
+        ],
+        "post-update-cmd": [
+            "php artisan optimize"
+        ],
+        "post-create-project-cmd": [
+            "php artisan key:generate"
+        ]
+    },
+    "config": {
+        "preferred-install": "dist"
+    },
+    "minimum-stability": "dev"
+}

@@ -17,6 +17,9 @@
       	"guzzle/guzzle": "3.7.1"
     },
     "autoload": {
-      "classmap": ["src/","core/","oss/","sdk.class.php"]
-    }
+      "psr-0": {
+			"Laggards\\Aliyun": "src/"
+		}
+    },
+	"minimum-stability": "stable"
 }

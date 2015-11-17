@@ -18,23 +18,5 @@
     },
     "autoload": {
       "classmap": ["src/","core/","oss/","sdk.class.php"]
-    },
-    "scripts": {
-        "post-install-cmd": [
-            "php artisan optimize"
-        ],
-        "pre-update-cmd": [
-            "php artisan clear-compiled"
-        ],
-        "post-update-cmd": [
-            "php artisan optimize"
-        ],
-        "post-create-project-cmd": [
-            "php artisan key:generate"
-        ]
-    },
-    "config": {
-        "preferred-install": "dist"
-    },
-    "minimum-stability": "dev"
+    }
 }

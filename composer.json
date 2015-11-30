@@ -1,25 +1,20 @@
 {
     "name": "laggards/aliyun",
     "description": "aliyun services for laravel 5.1",
-    "keywords": ["framework", "laravel", "aliyun"],
-	"homepage": "https://github.com/laggards/aliyun",
+    "require": {
+        "laravel/framework": "5.1.*",
+		"illuminate/support": ">=5.0",
+		"league/flysystem": "~1.0",
+      	"guzzle/guzzle": "3.7.1"
+    },
     "license": "MIT",
     "authors": [
         {
-            "name": "laggards",
-            "email": "laggards@foxmail.com"
+            "name": "Laggards",
+            "email": "laggards@hotmail.com"
         }
     ],
-    "require": {
-        "laravel/framework": "5.1.*",
-      	"illuminate/support": ">=5.0",
-      	"league/flysystem": "~1.0",
-      	"guzzle/guzzle": "3.7.1"
-    },
-    "autoload": {
-      "psr-0": {
-			"Laggards\\Aliyun": "src/"
-		}
-    },
-	"minimum-stability": "stable"
+	"psr-4": {
+	   "Laggards\\Aliyun\\": "src/"
+	}
 }

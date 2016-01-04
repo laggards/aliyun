@@ -1,44 +1,85 @@
 <?php namespace Laggards\Aliyun;
 
-require_once 'lib/OSS/sdk.class.php';
+require_once 'lib/AliyunOSS/sdk.class.php';
 use ALIOSS;
 
 class OSS extends ALIOSS
 {
-	public $client;
+	protected static $metaOptions = [
+        'CacheControl',
+        'Expires',
+        'UserMetadata',
+        'ContentType',
+        'ContentLanguage',
+        'ContentEncoding'
+    ];
+    
 	public $bucket;
+	
+	public $client;
 	
     public function __construct()
     {
 		$this->bucket = config('aliyun.oss.Bucket');
 		parent::__construct(config('aliyun.oss.AccessKeyId'), config('aliyun.oss.AccessKeySecret'), config('aliyun.oss.Endpoint'));
     }
-	
-	public function list_bucket($options = NULL) {
+    
+	public function list_object($bucket= NULL,$options = NULL) {
 		$options = array();
 		$response = parent::list_object($this->bucket, $options);
 		return $response;
     }
+    
+    public function getBucket()
+    {
+        return $this->bucket;
+    }
 	
-	public function put($bucket,$object, $file_path){
-		$options = array(
-			parent::OSS_HEADERS => array(
-				'Expires' => '2012-10-01 08:00:00',
-				'Cache-Control' => '2012-10-01 08:00:00',
-				'Content-Disposition' => 'just-for-test',
-				'Content-Encoding' => 'utf-8',
-				'Content-Type' => 'text/plain2',
-			),
-		);
-		$res = parent::upload_file_by_file($bucket, $object, $file_path, $options);
+	public function put($object, $file, $type = null){
+		if($type){
+			$object = $type.'/'.date("Y/m/d/").$object;
+		}else{
+			$object = 'uploads/'.date("Y/m/d/").$object;
+		}
+		if($this->is_exist($object)){
+			return false;
+		}else{
+			$options = array();		
+			$response = parent::upload_file_by_file($this->bucket, $object, $file, $options);
+			if($response->status === 200){
+				return $object; 
+			}else{
+				return false;
+			}	
+		}
+
 	}
 	
-	public function get(){
-		
+	public function get($object){
+		$response = parent::get_object($this->bucket, $object, $options = NULL);
+		if($response->status === 200){
+			return '//'.$this->bucket.'.'.config('aliyun.oss.Endpoint').'/'.$object; 
+		}else{
+			return false;
+		}
+	}
+	
+	public function is_exist($object){
+		$response = parent::is_object_exist($this->bucket, $object, $options = NULL);
+		if($response->status === 200){
+			return true;
+		}else{
+			return false;
+		}
 	}
 	
 	public function delete($object){
-		$res = parent::delete_object($this->bucket, $object);	
-		return $res;
+		$response = parent::delete_object($this->bucket, $object, $options = NULL);
+		var_dump($response);
+		if($response->status === 204){
+			return true;
+		}else{
+			return false;
+		}
 	}
 }

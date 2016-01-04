@@ -140,7 +140,3 @@ spl_autoload_register(function ($class) use ($mapping) {
         require $mapping[$class];
     }
 }, true);
-
-require __DIR__ . '/GuzzleHttp/functions.php';
-require __DIR__ . '/GuzzleHttp/Psr7/functions.php';
-require __DIR__ . '/GuzzleHttp/Promise/functions.php';

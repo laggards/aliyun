@@ -1,35 +1,38 @@
 <?php namespace Laggards\Aliyun;
-
-require_once 'lib/mns-autoloader.php';
+require_once ('lib/mns-autoloader.php');
 
 use AliyunMNS\Client;
 use AliyunMNS\Requests\SendMessageRequest;
 use AliyunMNS\Requests\CreateQueueRequest;
-use AliyunMNS\Exception\MnsException;
+//use AliyunMNS\Exception\MnsException;
 
-class MSN
+class MNS 
 {
 	private $accessId;
     private $accessKey;
     private $endPoint;
-    private $client;
+    private $queue;
+    public $client;
 	
     public function __construct()
     {
-		$this->bucket = config('aliyun.oss.Bucket');
-		parent::__construct(config('aliyun.oss.AccessKeyId'), config('aliyun.oss.AccessKeySecret'), config('aliyun.oss.Endpoint'));
+		$this->accessId = config('aliyun.mns.AccessKeyId');
+        $this->accessKey = config('aliyun.mns.AccessKeySecret');
+        $this->endPoint =  config('aliyun.mns.Endpoint');
+        $this->queue = config('aliyun.mns.Queue');
+        $this->client = new Client($this->endPoint, $this->accessId, $this->accessKey);
+        $this->queue = $this->client->getQueueRef($this->queue);
     }
 	
-	public function SendMessage() {
-		$messageBody = "test";
+	public function SendMessage($messageBody) {
         // as the messageBody will be automatically encoded
         // the MD5 is calculated for the encoded body
         $bodyMD5 = md5(base64_encode($messageBody));
         $request = new SendMessageRequest($messageBody);
         try
         {
-            $res = $queue->sendMessage($request);
-            echo "MessageSent! \n";
+            $res = $this->queue->sendMessage($request);
+            return true;
         }
         catch (MnsException $e)
         {
@@ -55,19 +58,16 @@ class MSN
 		$receiptHandle = NULL;
         try
         {
-            $res = $queue->receiveMessage();
-            echo "ReceiveMessage Succeed! \n";
-            if (strtoupper($bodyMD5) == $res->getMessageBodyMD5())
-            {
-                echo "You got the message sent by yourself! \n";
-            }
+            $res = $this->queue->receiveMessage();
             $receiptHandle = $res->getReceiptHandle();
+            $MessageBody = $res->getMessageBody();
+            return array('MessageBody'=>$MessageBody,'receiptHandle'=>$receiptHandle);
         }
         catch (MnsException $e)
         {
             echo "ReceiveMessage Failed: " . $e;
             return;
-        }	
+        }
 	}
 	
 	public function BatchReceiveMessage() {
@@ -87,7 +87,7 @@ class MSN
 		try
         {
             $res = $queue->deleteMessage($receiptHandle);
-            echo "DeleteMessage Succeed! \n";
+            return true;
         }
         catch (MnsException $e)
         {

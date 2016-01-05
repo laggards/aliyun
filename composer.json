@@ -14,7 +14,9 @@
             "email": "laggards@hotmail.com"
         }
     ],
-	"psr-4": {
-	   "Laggards\\Aliyun\\": "src/"
-	}
+	"autoload": {
+        "psr-4": {
+            "Laggards\\Aliyun\\": "src/"
+        }
+    }
 }

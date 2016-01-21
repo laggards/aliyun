@@ -29,6 +29,10 @@ class AliyunFacade extends Facade
 				$mns = new MNS();
 				return $mns;
 				break;
+			case 'memcache':
+				$memcache = new MemcacheSASL();
+				return $memcache;
+				break;
 			default:
 				return null;
 				break;	

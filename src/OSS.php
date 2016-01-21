@@ -2,6 +2,7 @@
 
 require_once 'lib/AliyunOSS/sdk.class.php';
 use ALIOSS;
+use Carbon\Carbon;
 
 class OSS extends ALIOSS
 {
@@ -21,7 +22,7 @@ class OSS extends ALIOSS
     public function __construct()
     {
 		$this->bucket = config('aliyun.oss.Bucket');
-		parent::__construct(config('aliyun.oss.AccessKeyId'), config('aliyun.oss.AccessKeySecret'), config('aliyun.oss.Endpoint'));
+		return parent::__construct(config('aliyun.oss.AccessKeyId'), config('aliyun.oss.AccessKeySecret'), config('aliyun.oss.Endpoint'));
     }
     
 	public function list_object($bucket= null,$options = null) {
@@ -141,4 +142,49 @@ class OSS extends ALIOSS
 			return false;
 		}
 	}
+	
+	public function signature($bucket = null, $dir = null){
+		if($bucket == null){
+			$host = 'http://'.$this->bucket.'.'.config('aliyun.oss.Endpoint');
+		}else{
+			$host = 'http://'.$bucket.'.'.config('aliyun.oss.Endpoint');
+		}
+		$now = Carbon::now();
+		$end = $now->addMinutes(30);
+		$expiration = $end->toIso8601String();
+		$pos = strpos($expiration, '+');
+		$expiration = substr($expiration, 0, $pos);
+		$expiration .='Z';
+		//$oss_sdk_service = $this->client;
+		//var_dump($oss_sdk_service);
+		if($dir == null){
+			$dir = 'temp/'.date("Y/m/d/");
+		}
+
+		$condition = array(0=>'content-length-range', 1=>0, 2=>1048576000);
+		$conditions[] = $condition; 
+		
+		$start = array(0=>'starts-with', 1=>'$key', 2=>$dir);
+		$conditions[] = $start; 
+
+		$arr = array('expiration'=>$expiration,'conditions'=>$conditions);
+		//echo json_encode($arr);
+		//return;
+		$policy = json_encode($arr);
+		$base64_policy = base64_encode($policy);
+		$string_to_sign = $base64_policy;
+		
+		$signature = base64_encode(hash_hmac('sha1', $string_to_sign, config('aliyun.oss.AccessKeySecret'), true));
+
+		$response = array();
+		$response['accessid'] = config('aliyun.oss.AccessKeyId');
+		$response['host'] = $host;
+		$response['policy'] = $base64_policy;
+		$response['signature'] = $signature;
+		$response['expire'] = $end;
+		//这个参数是设置用户上传指定的前缀
+		$response['dir'] = $dir;
+		return $response;
+	}
+
 }

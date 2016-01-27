@@ -41,7 +41,7 @@ class OSS extends ALIOSS
 	
 	public function put( $file, $object = null, $bucket = null ){
 		if($object == null){
-			$FileType = $temp_file->getClientOriginalExtension();
+			$FileType = $file->getClientOriginalExtension();
 			$newFileName = str_random(32).'.'.$FileType;
 			$object = 'temp/'.date("Y/m/d/").$newFileName;
 		}

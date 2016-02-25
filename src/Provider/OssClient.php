@@ -162,6 +162,8 @@ class OssClient extends ALIOSS
 		//var_dump($oss_sdk_service);
 		if($dir == null){
 			$dir = 'temp/'.date("Y/m/d/");
+		}else{
+			$dir = 'temp/'.date("Y/m/d/").$dir;
 		}
 
 		$condition = array(0=>'content-length-range', 1=>0, 2=>1048576000);

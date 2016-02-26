@@ -2,9 +2,7 @@
     "name": "laggards/aliyun",
     "description": "aliyun services for laravel 5.1",
     "require": {
-		"league/flysystem": "~1.0",
-      	"guzzlehttp/guzzle":"~6.0",
-		"aliyuncs/oss-sdk-php": "~2.0"
+		"php": ">=5.5.9"
     },
     "license": "MIT",
     "authors": [

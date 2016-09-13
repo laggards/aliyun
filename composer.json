@@ -2,7 +2,8 @@
     "name": "laggards/aliyun",
     "description": "aliyun services for laravel 5.1",
     "require": {
-		"php": ">=5.5.9"
+		"php": ">=5.5.9",
+		"aliyuncs/oss-sdk-php": "~2.0"
     },
     "license": "MIT",
     "authors": [

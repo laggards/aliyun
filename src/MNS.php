@@ -39,7 +39,7 @@ class MNS
         $topic = $this->client->getTopicRef(config('aliyun.sms.TopicId'));
         $messageAttributes = new SmsAttributes(config('aliyun.sms.Sign'), $templateCode, $smsParams, $receiver);
         $messageBody = "smsmessage";
-        $request = new PublishMessageRequest($messageBody, $messageAttributes);
+        $request = new PublishMessageRequest($messageBody, new MessageAttributes($messageAttributes));
         try
         {
             $res = $topic->publishMessage($request);

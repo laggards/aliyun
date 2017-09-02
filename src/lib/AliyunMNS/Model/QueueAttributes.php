@@ -15,6 +15,7 @@ class QueueAttributes
     private $messageRetentionPeriod;
     private $visibilityTimeout;
     private $pollingWaitSeconds;
+    private $LoggingEnabled;
 
     # the following attributes cannot be changed
     private $queueName;
@@ -35,13 +36,15 @@ class QueueAttributes
         $lastModifyTime = NULL,
         $activeMessages = NULL,
         $inactiveMessages = NULL,
-        $delayMessages = NULL)
+        $delayMessages = NULL,
+        $LoggingEnabled = NULL)
     {
         $this->delaySeconds = $delaySeconds;
         $this->maximumMessageSize = $maximumMessageSize;
         $this->messageRetentionPeriod = $messageRetentionPeriod;
         $this->visibilityTimeout = $visibilityTimeout;
         $this->pollingWaitSeconds = $pollingWaitSeconds;
+        $this->loggingEnabled = $LoggingEnabled;
 
         $this->queueName = $queueName;
         $this->createTime = $createTime;
@@ -59,6 +62,16 @@ class QueueAttributes
     public function getDelaySeconds()
     {
         return $this->delaySeconds;
+    }
+
+    public function setLoggingEnabled($loggingEnabled)
+    {
+        $this->loggingEnabled = $loggingEnabled;
+    }
+
+    public function getLoggingEnabled()
+    {
+        return $this->loggingEnabled;
     }
 
     public function setMaximumMessageSize($maximumMessageSize)
@@ -153,6 +166,10 @@ class QueueAttributes
         {
             $xmlWriter->writeElement(Constants::POLLING_WAIT_SECONDS, $this->pollingWaitSeconds);
         }
+        if ($this->loggingEnabled !== NULL)
+        {
+            $xmlWriter->writeElement(Constants::LOGGING_ENABLED, $this->loggingEnabled ? "True" : "False");
+        }
     }
 
     static public function fromXML(\XMLReader $xmlReader)
@@ -168,6 +185,7 @@ class QueueAttributes
         $activeMessages = NULL;
         $inactiveMessages = NULL;
         $delayMessages = NULL;
+        $loggingEnabled = NULL;
 
         while ($xmlReader->read())
         {
@@ -251,6 +269,21 @@ class QueueAttributes
                         $delayMessages = $xmlReader->value;
                     }
                     break;
+                case 'LoggingEnabled':
+                    $xmlReader->read();
+                    if ($xmlReader->nodeType == \XMLReader::TEXT)
+                    {
+                        $loggingEnabled = $xmlReader->value;
+                        if ($loggingEnabled == "True")
+                        {
+                            $loggingEnabled = True;
+                        }
+                        else
+                        {
+                            $loggingEnabled = False;
+                        }
+                    }
+                    break;
                 }
             }
         }
@@ -266,7 +299,8 @@ class QueueAttributes
             $lastModifyTime,
             $activeMessages,
             $inactiveMessages,
-            $delayMessages);
+            $delayMessages,
+            $loggingEnabled);
         return $attributes;
     }
 }

@@ -13,8 +13,22 @@ class ReceiveMessageResponse extends BaseResponse
 {
     use MessagePropertiesForReceive;
 
-    public function __construct()
+    // boolean, whether the message body will be decoded as base64
+    private $base64;
+
+    public function __construct($base64 = TRUE)
     {
+        $this->base64 = $base64;
+    }
+
+    public function setBase64($base64)
+    {
+        $this->base64 = $base64;
+    }
+
+    public function isBase64()
+    {
+        return ($this->base64 == TRUE);
     }
 
     public function parseResponse($statusCode, $content)
@@ -26,10 +40,9 @@ class ReceiveMessageResponse extends BaseResponse
             $this->parseErrorResponse($statusCode, $content);
         }
 
-        $xmlReader = new \XMLReader();
+        $xmlReader = $this->loadXmlContent($content);
         try {
-            $xmlReader->XML($content);
-            $this->readMessagePropertiesForReceiveXML($xmlReader);
+            $this->readMessagePropertiesForReceiveXML($xmlReader, $this->base64);
         } catch (\Exception $e) {
             throw new MnsException($statusCode, $e->getMessage(), $e);
         } catch (\Throwable $t) {
@@ -41,9 +54,8 @@ class ReceiveMessageResponse extends BaseResponse
     public function parseErrorResponse($statusCode, $content, MnsException $exception = NULL)
     {
         $this->succeed = FALSE;
-        $xmlReader = new \XMLReader();
+        $xmlReader = $this->loadXmlContent($content);
         try {
-            $xmlReader->XML($content);
             $result = XMLParser::parseNormalError($xmlReader);
             if ($result['Code'] == Constants::QUEUE_NOT_EXIST)
             {

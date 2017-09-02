@@ -39,10 +39,10 @@ class ChangeMessageVisibilityResponse extends BaseResponse
             $this->parseErrorResponse($statusCode, $content);
         }
 
-        $xmlReader = new \XMLReader();
+        $xmlReader = $this->loadXmlContent($content);
+
         try {
-            $xmlReader->XML($content);
-            $message = Message::fromXML($xmlReader);
+            $message = Message::fromXML($xmlReader, TRUE);
             $this->receiptHandle = $message->getReceiptHandle();
             $this->nextVisibleTime = $message->getNextVisibleTime();
         } catch (\Exception $e) {
@@ -55,9 +55,9 @@ class ChangeMessageVisibilityResponse extends BaseResponse
     public function parseErrorResponse($statusCode, $content, MnsException $exception = NULL)
     {
         $this->succeed = FALSE;
-        $xmlReader = new \XMLReader();
+        $xmlReader = $this->loadXmlContent($content);
+
         try {
-            $xmlReader->XML($content);
             $result = XMLParser::parseNormalError($xmlReader);
 
             if ($result['Code'] == Constants::INVALID_ARGUMENT)

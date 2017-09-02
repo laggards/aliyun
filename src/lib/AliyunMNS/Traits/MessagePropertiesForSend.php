@@ -39,17 +39,21 @@ trait MessagePropertiesForSend
         $this->priority = $priority;
     }
 
-    public function writeMessagePropertiesForSendXML(\XMLWriter $xmlWriter)
+    public function writeMessagePropertiesForSendXML(\XMLWriter $xmlWriter, $base64)
     {
         if ($this->messageBody != NULL)
         {
-            $xmlWriter->writeElement(Constants::MESSAGE_BODY, base64_encode($this->messageBody));
+            if ($base64 == TRUE) {
+                $xmlWriter->writeElement(Constants::MESSAGE_BODY, base64_encode($this->messageBody));
+            } else {
+                $xmlWriter->writeElement(Constants::MESSAGE_BODY, $this->messageBody);
+            }
         }
         if ($this->delaySeconds != NULL)
         {
             $xmlWriter->writeElement(Constants::DELAY_SECONDS, $this->delaySeconds);
         }
-        if ($this->priority != NULL)
+        if ($this->priority !== NULL)
         {
             $xmlWriter->writeElement(Constants::PRIORITY, $this->priority);
         }

@@ -1,7 +1,9 @@
-<?php namespace Laggards\Aliyun;
+<?php
+
+namespace Laggards\Aliyun;
 
 class MemcacheSASL
-{	
+{
     protected $_request_format = 'CCnCCnNNNN';
     protected $_response_format = 'Cmagic/Copcode/nkeylength/Cextralength/Cdatatype/nstatus/Nbodylength/NOpaque/NCAS1/NCAS2';
     const OPT_COMPRESSION = -1001;
@@ -25,14 +27,14 @@ class MemcacheSASL
             $valuelength = strlen($data['value']);
         }
         $bodylength = $extralength + $keylength + $valuelength;
-        $ret = pack($this->_request_format, 
-                0x80, 
-                $data['opcode'], 
+        $ret = pack($this->_request_format,
+                0x80,
+                $data['opcode'],
                 $keylength,
                 $extralength,
                 array_key_exists('datatype', $data) ? $data['datatype'] : null,
                 array_key_exists('status', $data) ? $data['status'] : null,
-                $bodylength, 
+                $bodylength,
                 array_key_exists('Opaque', $data) ? $data['Opaque'] : null,
                 array_key_exists('CAS1', $data) ? $data['CAS1'] : null,
                 array_key_exists('CAS2', $data) ? $data['CAS2'] : null
@@ -63,21 +65,21 @@ class MemcacheSASL
     {
         $data = fread($this->_fp, 24);
         $array = $this->_show_request($data);
-	if ($array['bodylength']) {
-	    $bodylength = $array['bodylength'];
-	    $data = '';
-	    while ($bodylength > 0) {
-		$recv_data = fread($this->_fp, $bodylength);
-		$bodylength -= strlen($recv_data);
-		$data .= $recv_data;
-	    }
-	    if ($array['extralength']) {
-		$extra_unpacked = unpack('Nint', substr($data, 0, $array['extralength']));
-		$array['extra'] = $extra_unpacked['int'];
-	    }
-	    $array['key'] = substr($data, $array['extralength'], $array['keylength']);
-	    $array['body'] = substr($data, $array['extralength'] + $array['keylength']);
-	}
+        if ($array['bodylength']) {
+            $bodylength = $array['bodylength'];
+            $data = '';
+            while ($bodylength > 0) {
+                $recv_data = fread($this->_fp, $bodylength);
+                $bodylength -= strlen($recv_data);
+                $data .= $recv_data;
+            }
+            if ($array['extralength']) {
+                $extra_unpacked = unpack('Nint', substr($data, 0, $array['extralength']));
+                $array['extra'] = $extra_unpacked['int'];
+            }
+            $array['key'] = substr($data, $array['extralength'], $array['keylength']);
+            $array['body'] = substr($data, $array['extralength'] + $array['keylength']);
+        }
         return $array;
     }
     public function __construct()
@@ -117,15 +119,15 @@ class MemcacheSASL
     }
     public function addServers($servers)
     {
-      for ($i = 0; $i < count($servers); $i++) {
-        $s = $servers[$i];
-        if (count($s) >= 2) {
-          $this->addServer($s[0], $s[1]);
-        } else {
-          trigger_error("could not add entry #"
+        for ($i = 0; $i < count($servers); $i++) {
+            $s = $servers[$i];
+            if (count($s) >= 2) {
+                $this->addServer($s[0], $s[1]);
+            } else {
+                trigger_error("could not add entry #"
             .($i+1)." to the server list", E_USER_WARNING);
+            }
         }
-      }
     }
     public function addServersByString($servers)
     {
@@ -136,13 +138,13 @@ class MemcacheSASL
         $this->addServers($servers);
     }
     public function get($key)
-    {   
+    {
         $sent = $this->_send(array(
                     'opcode' => 0x00,
                     'key' => $key,
                     ));
-	$data = $this->_recv();
-	if (0 == $data['status']) {
+        $data = $this->_recv();
+        if (0 == $data['status']) {
             if ($data['extra'] & self::MEMC_VAL_COMPRESSED) {
                 $body = gzuncompress($data['body']);
             } else {
@@ -168,13 +170,13 @@ class MemcacheSASL
             }
             return $body;
         }
-        return FALSE;
+        return false;
     }
     /**
      * process value and get flag
-     * 
+     *
      * @param int $flag
-     * @param mixed $value 
+     * @param mixed $value
      * @access protected
      * @return array($flag, $processed_value)
      */
@@ -194,7 +196,7 @@ class MemcacheSASL
         }
         if (array_key_exists(self::OPT_COMPRESSION, $this->_options) and $this->_options[self::OPT_COMPRESSION]) {
             $flag |= self::MEMC_VAL_COMPRESSED;
-	    $value = gzcompress($value);
+            $value = gzcompress($value);
         }
         return array($flag, $value);
     }
@@ -210,9 +212,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     public function set($key, $value, $expiration = 0)
     {
@@ -226,9 +228,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     public function delete($key)
     {
@@ -238,9 +240,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     public function replace($key, $value, $expiration = 0)
     {
@@ -254,9 +256,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     protected function _upper($num)
     {
@@ -277,9 +279,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     public function decrement($key, $offset = 1)
     {
@@ -292,14 +294,14 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     /**
      * Get statistics of the server
      *
-     * @param string $type The type of statistics to fetch. Valid values are 
+     * @param string $type The type of statistics to fetch. Valid values are
      *                     {reset, malloc, maps, cachedump, slabs, items,
      *                     sizes}. According to the memcached protocol spec
      *                     these additional arguments "are subject to change
@@ -308,7 +310,7 @@ class MemcacheSASL
      * @link http://code.google.com/p/memcached/wiki/BinaryProtocolRevamped#Stat
      * @access public
      * @return array  Returns an associative array of server statistics or
-     *                FALSE on failure. 
+     *                FALSE on failure.
      */
     public function getStats($type = null)
     {
@@ -339,9 +341,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     public function prepend($key, $value)
     {
@@ -354,9 +356,9 @@ class MemcacheSASL
                     ));
         $data = $this->_recv();
         if ($data['status'] == 0) {
-            return TRUE;
+            return true;
         }
-        return FALSE;
+        return false;
     }
     public function getMulti(array $keys)
     {
@@ -374,7 +376,7 @@ class MemcacheSASL
     protected $_options = array();
     public function setOption($key, $value)
     {
-	$this->_options[$key] = $value;
+        $this->_options[$key] = $value;
     }
     /**
      * Set the memcache object to be a session handler
@@ -393,20 +395,20 @@ class MemcacheSASL
     public function setSaveHandler()
     {
         session_set_save_handler(
-            function($savePath, $sessionName){ // open
+            function ($savePath, $sessionName) { // open
             },
-            function(){ // close
+            function () { // close
             },
-            function($sessionId){ // read
+            function ($sessionId) { // read
                 return $this->get($sessionId);
             },
-            function($sessionId, $data){ // write
+            function ($sessionId, $data) { // write
                 return $this->set($sessionId, $data);
             },
-            function($sessionId){ // destroy
+            function ($sessionId) { // destroy
                 $this->delete($sessionId);
             },
-            function($lifetime) { // gc
+            function ($lifetime) { // gc
             }
         );
     }

@@ -30,9 +30,9 @@ class CreateQueueResponse extends BaseResponse
     public function parseErrorResponse($statusCode, $content, MnsException $exception = NULL)
     {
         $this->succeed = FALSE;
-        $xmlReader = new \XMLReader();
+        $xmlReader = $this->loadXmlContent($content);
+
         try {
-            $xmlReader->XML($content);
             $result = XMLParser::parseNormalError($xmlReader);
 
             if ($result['Code'] == Constants::INVALID_ARGUMENT)

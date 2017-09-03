@@ -49,7 +49,7 @@ php artisan vendor:publish --provider="Laggards\Aliyun\AliyunServiceProvider"
 
 ## 目前支持的阿里云服务
 
-SDK 目前支持下列服务:
+目前支持下列服务:
 
 | 服务名  | 类名  | API 版本 | 服务介绍
 | :------------ |:---------------:| -----:| -----:|

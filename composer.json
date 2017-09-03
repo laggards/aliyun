@@ -1,6 +1,6 @@
 {
     "name": "laggards/aliyun",
-    "description": "aliyun services for laravel 5.1",
+    "description": "提供阿里云 OSS、MNS(含SMS短信消息)、memcached等服务接口，适用于Laravel、Symfony、TinyLara等所有支持composer的PHP框架。",
     "require": {
 		"php": ">=5.5.9",
 		"aliyuncs/oss-sdk-php": "~2.0"

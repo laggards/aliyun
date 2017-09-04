@@ -37,6 +37,9 @@ class MNS
     public function SendSMSMessage($receiver,$templateCode,$smsParams)
     {
         $topic = $this->client->getTopicRef(config('aliyun.sms.TopicId'));
+        foreach($smsParams as &$param){
+          $param = (string)$param;
+        }
         $messageAttributes = new SmsAttributes(config('aliyun.sms.Sign'), $templateCode, $smsParams, $receiver);
         $messageBody = "smsmessage";
         $request = new PublishMessageRequest($messageBody, new MessageAttributes($messageAttributes));

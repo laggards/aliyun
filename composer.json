@@ -7,12 +7,12 @@
         "Laravel",
         "Aliyun",
         "MNS",
-	"OSS",
-	"Memcached"
+        "OSS",
+        "Memcached"
     ],
     "require": {
-		"php": ">=5.5.9",
-		"aliyuncs/oss-sdk-php": "~2.0"
+		"php": "^7.1.3",
+        "alibabacloud/sdk": "~1.8"
     },
     "license": "MIT",
     "authors": [

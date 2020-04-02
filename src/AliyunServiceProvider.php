@@ -3,10 +3,12 @@
 namespace Laggards\Aliyun;
 
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Compilers\BladeCompiler;
+use AlibabaCloud\Client\AlibabaCloud;
 
 class AliyunServiceProvider extends ServiceProvider
 {
+    protected $defer = true;
+
     /**
      * Bootstrap the application services.
      *
@@ -15,8 +17,8 @@ class AliyunServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->publishes([
-            __DIR__.'/../config/aliyun.php' => $this->app->configPath().'/aliyun.php',
-        ], 'config');
+            __DIR__.'/config/aliyun.php' => config_path('aliyun.php'),
+        ]);
 
     }
 
@@ -31,6 +33,22 @@ class AliyunServiceProvider extends ServiceProvider
             __DIR__.'/../config/aliyun.php',
             'aliyun'
         );
-        //$this->app->alias('aliyun', 'Aws\Sdk');
+        
+        $this->app->singleton('aliyun', function($app){
+            $config = $app->make('config');
+
+            $accessKey = $config->get('aliyun.key');
+            $accessSecret = $config->get('aliyun.secret');
+            $regionId = $config->get('aliyun.regionId');
+
+            return new AliyunService;
+            // return AlibabaCloud::accessKeyClient($accessKey, $accessSecret)
+            //                     ->regionId($regionId)
+            //                     ->asDefaultClient();
+        });
+    }
+
+    public function provides() {
+        return ['aliyun'];
     }
 }

@@ -25,5 +25,15 @@
         "psr-4": {
             "Laggards\\Aliyun\\": "src/"
         }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Laggards\\Aliyun\\AliyunServiceProvider"
+            ],
+            "aliases": {
+                "Aliyun": "Laggards\\Aliyun\\AliyunFacade"
+            }
+        }
     }
 }
